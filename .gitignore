@@ -1,3 +1,5 @@
 mvn*
 target
 HELP.md
+.idea
+.DS_Store
