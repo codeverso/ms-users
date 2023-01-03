@@ -1,9 +1,7 @@
 package com.codeverso.msusers.controller;
 
-import com.codeverso.msusers.controller.UserController;
 import com.codeverso.msusers.model.dto.UserResponse;
 import com.codeverso.msusers.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +21,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @WebMvcTest(controllers = UserController.class)
 @ExtendWith(SpringExtension.class)
@@ -53,7 +50,7 @@ public class UserControllerTest {
 
         users.add(userResponse);
 
-        when(this.userService.getAllUsers())
+        when(userService.getAllUsers())
                 .thenReturn(users);
 
         mockMvc.perform(get(USERS_ENDPOINT))
@@ -66,4 +63,5 @@ public class UserControllerTest {
         verify(userService, times(1)).getAllUsers();
         verifyNoMoreInteractions(userService);
     }
+
 }

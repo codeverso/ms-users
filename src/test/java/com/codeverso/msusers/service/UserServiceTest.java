@@ -3,8 +3,6 @@ package com.codeverso.msusers.service;
 import com.codeverso.msusers.model.dto.UserResponse;
 import com.codeverso.msusers.model.entity.UserEntity;
 import com.codeverso.msusers.repository.UserRepository;
-import com.codeverso.msusers.service.UserService;
-import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,20 +16,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("User service test")
+@DisplayName("User Service Tests")
 public class UserServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private UserRepository userRepository;
 
     private final List<UserEntity> entities = new ArrayList<>();
 
@@ -66,7 +65,7 @@ public class UserServiceTest {
 
         List<UserResponse> entitiesConverted = entities.stream()
                 .map(UserResponse::valueOf)
-                .toList();
+                .collect(Collectors.toList());
 
         //when
         List<UserResponse> userResponses = userService.getAllUsers();
