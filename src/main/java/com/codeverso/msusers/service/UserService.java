@@ -1,7 +1,7 @@
 package com.codeverso.msusers.service;
 
+import com.codeverso.msusers.exception.NotFoundException;
 import com.codeverso.msusers.model.dto.UserResponse;
-import com.codeverso.msusers.model.entity.UserEntity;
 import com.codeverso.msusers.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,5 +24,12 @@ public class UserService {
                 .stream()
                 .map(UserResponse::valueOf)
                 .toList();
+    }
+
+    public UserResponse getUserById(String userId) {
+        log.info("Getting user by id {}", userId);
+        return userRepository.findById(userId)
+                .map(UserResponse::valueOf)
+                .orElseThrow(NotFoundException::new);
     }
 }

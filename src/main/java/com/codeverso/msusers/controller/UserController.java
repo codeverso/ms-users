@@ -3,10 +3,7 @@ package com.codeverso.msusers.controller;
 import com.codeverso.msusers.model.dto.UserResponse;
 import com.codeverso.msusers.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,4 +23,9 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @GetMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse getUserById(@PathVariable(name = "userId") String userId) {
+        return userService.getUserById(userId);
+    }
 }
