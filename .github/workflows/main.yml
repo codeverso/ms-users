@@ -41,13 +41,13 @@ jobs:
       
       - name: Run migrations
         run: mvn flyway:migrate -Dflyway.url=jdbc:postgresql://localhost:5432/users -Dflyway.user=admin -Dflyway.password=root
-        
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
 
-      - name: Set up JDK 11
+      - name: Setup Java Environment
         uses: actions/setup-java@v2
         with:
+          distribution: temurin
           java-version: 17
-          distribution: zulu
           cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
