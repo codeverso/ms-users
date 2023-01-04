@@ -72,6 +72,6 @@ jobs:
         run: mvn versions:set -DremoveSnapshot
 
       - name: Publish artifact on GitHub Packages
-        run: mvn -B clean deploy -DskipTests
+        run: mvn -B clean package -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
