@@ -45,8 +45,11 @@ jobs:
       - name: Run migrations
         run: mvn flyway:migrate -Dflyway.url=jdbc:postgresql://localhost:5432/users -Dflyway.user=admin -Dflyway.password=root
 
+      - name: Wait for the backend service to start
+        run: sh -s -- http://localhost:8088/users -t 30 -- echo "Backend is up"
+
       - name: Build with Maven
-        run: mvn clean package
+        run: mvn clean test
 
       - name: Setup Java Environment
         uses: actions/setup-java@v2
