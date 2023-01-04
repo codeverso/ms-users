@@ -20,8 +20,8 @@ jobs:
         - 5432
         
     services:
-      db:
-        image: postgres:14.5
+      postgres:
+        image: postgres:latest
         env:
           POSTGRES_DB: ${{ matrix.database-name }}
           POSTGRES_USER: ${{ matrix.database-user }}
@@ -33,35 +33,18 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-      app:
-        container_name: ms-users
-        image: ms-users
-        networks:
-          - codeverso
-        build:
-          context: .
-        ports:
-          - "8080:8080"
-        expose:
-          - '8080'
-        depends_on:
-          - db
-        environment:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/users
-          SPRING_DATASOURCE_USERNAME: admin
-          SPRING_DATASOURCE_PASSWORD: root
-          SPRING_JPA_HIBERNATE_DDL_AUTO: update
         
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Java Environment
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
       
       - name: Run migrations
         run: mvn flyway:migrate -Dflyway.url=jdbc:postgresql://localhost:5432/users -Dflyway.user=admin -Dflyway.password=root
-
-networks:
-  codeverso:
-    driver: bridge
-
-volumes:
-  db_users:
