@@ -19,5 +19,4 @@ jobs:
       - name: Build the ms-users Docker image
         run: |
           docker build . --tag ghcr.io/codeverso/ms-users:latest
-          docker run ghcr.io/codeverso/ms-users:latest
           docker push ghcr.io/codeverso/ms-users:latest
