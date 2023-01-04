@@ -21,6 +21,10 @@ jobs:
         - 5432
         
     services:
+      ms-users-api:
+        image: codeverso/ms-users:latest
+        ports: 
+          - 8080:8080
       postgres:
         image: postgres:latest
         env:
@@ -37,7 +41,10 @@ jobs:
           --health-retries 5
         
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      - name: Build with Maven
+        run: mvn -B -DskipTests package --file pom.xml
       
       - name: Run migrations
         run: mvn flyway:migrate -Dflyway.url=jdbc:postgresql://localhost:5432/users -Dflyway.user=admin -Dflyway.password=root
@@ -49,29 +56,7 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Build with Maven
-        run: mvn clean install
-
       - name: curl
         uses: wei/curl@v1
         with:
           args: -X GET http://localhost:8080/users
-
-  artifact:
-    name: Publish Artifact
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: adopt
-          java-version: 17
-
-      - name: Removing -SNAPSHOT
-        run: mvn versions:set -DremoveSnapshot
-
-      - name: Publish artifact on GitHub Packages
-        run: mvn -B clean package -DskipTests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
