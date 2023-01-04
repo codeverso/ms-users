@@ -50,7 +50,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn spring-boot:run
+        run: mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=dev"
 
       - name: curl
         uses: wei/curl@v1
