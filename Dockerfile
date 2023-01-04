@@ -7,5 +7,5 @@ FROM openjdk:17.0.2
 EXPOSE 8080
 
 ARG JAR_FILE=target/*.jar
-COPY --from=build /usr/src/${JAR_FILE} /app/app.jar
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev", "/app/app.jar"]
+COPY --from=build /usr/src/${JAR_FILE} app.jar
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev", "app.jar"]
