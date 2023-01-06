@@ -38,6 +38,7 @@ public class UserService {
 
     public String createUser(UserRequest userRequest) {
         log.info("Creating a new user with: {}", userRequest);
+
         UserEntity userEntity = UserEntity.valueOf(userRequest);
         userEntity.setCreatedAt(LocalDateTime.now());
         userEntity.setUpdatedAt(LocalDateTime.now());
