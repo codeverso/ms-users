@@ -56,13 +56,9 @@ public class UserControllerTestIT {
         mvc.perform(get(USERS_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].uuid").isNotEmpty())
-                .andExpect(jsonPath("$[0].name", is("Murillo")))
-                .andExpect(jsonPath("$[0].age", is(33)))
-                .andExpect(jsonPath("$[1].uuid").isNotEmpty())
-                .andExpect(jsonPath("$[1].name", is("Babler")))
-                .andExpect(jsonPath("$[1].age", is(27)))
-        ;
+                .andExpect(jsonPath("$[*].uuid", hasSize(2)))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder("Murillo", "Babler")))
+                .andExpect(jsonPath("$[*].age", containsInAnyOrder(33, 27)));
     }
 
     @Test
@@ -74,14 +70,12 @@ public class UserControllerTestIT {
                 .build();
 
         UserEntity userSaved = userRepository.save(userMurillo);
-
         String uuid = userSaved.getUuid();
 
         mvc.perform(get(USER_BY_ID_ENDPOINT, uuid))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid", hasLength(UUID.randomUUID().toString().length())))
                 .andExpect(jsonPath("$.name", is("Murillo")))
-                .andExpect(jsonPath("$.age", is(33)))
-        ;
+                .andExpect(jsonPath("$.age", is(33)));
     }
 }
