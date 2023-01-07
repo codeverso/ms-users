@@ -16,8 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -97,9 +96,9 @@ public class UserControllerTest {
         mockMvc.perform(get(USERS_ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].uuid", is(uuid)))
-                .andExpect(jsonPath("$[0].name", is("Gabriel")))
-                .andExpect(jsonPath("$[0].age", is(27)));
+                .andExpect(jsonPath("$[*].uuid", containsInAnyOrder(uuid)))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder("Gabriel")))
+                .andExpect(jsonPath("$[*].age", containsInAnyOrder(27)));
 
         verify(userService, times(1)).getAllUsers();
         verifyNoMoreInteractions(userService);
