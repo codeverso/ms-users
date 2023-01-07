@@ -3,7 +3,6 @@ package com.codeverso.msusers.integration;
 import com.codeverso.msusers.integration.core.IntegrationTest;
 import com.codeverso.msusers.model.entity.UserEntity;
 import com.codeverso.msusers.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import java.util.UUID;
+
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.jdbc.JdbcTestUtils.deleteFromTables;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,7 +34,7 @@ public class UserControllerTestIT {
 
     @BeforeEach
     public void setUp() {
-
+        deleteFromTables(jdbcTemplate, "users");
     }
 
     @Test
@@ -73,19 +73,15 @@ public class UserControllerTestIT {
                 .name("Murillo")
                 .build();
 
-        userRepository.save(userMurillo);
+        UserEntity userSaved = userRepository.save(userMurillo);
 
-        mvc.perform(get(USERS_ENDPOINT))
+        String uuid = userSaved.getUuid();
+
+        mvc.perform(get(USER_BY_ID_ENDPOINT, uuid))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].uuid").isNotEmpty())
-                .andExpect(jsonPath("$[0].name", is("Murillo")))
-                .andExpect(jsonPath("$[0].age", is(33)))
+                .andExpect(jsonPath("$.uuid", hasLength(UUID.randomUUID().toString().length())))
+                .andExpect(jsonPath("$.name", is("Murillo")))
+                .andExpect(jsonPath("$.age", is(33)))
         ;
-    }
-
-    @AfterEach
-    void tearDown() {
-        deleteFromTables(jdbcTemplate, "users");
     }
 }
