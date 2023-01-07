@@ -1,0 +1,23 @@
+name: Java CI with Maven
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Java Environment
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Build with Maven and Unit tests
+        run: mvn clean install
+
+      - name: Integration Tests
+        run: mvn -Pintegration integration-test
