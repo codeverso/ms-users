@@ -8,20 +8,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.nio.file.Files;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.jdbc.JdbcTestUtils.deleteFromTables;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @IntegrationTest
 public class UserControllerTestIT {
@@ -102,8 +99,6 @@ public class UserControllerTestIT {
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.uuid", hasLength(UUID.randomUUID().toString().length())))
-                .andExpect(jsonPath("$.name", is("johndoe")))
-                .andExpect(jsonPath("$.age", is(33)));
+                .andExpect(header().string("Location", hasLength(UUID.randomUUID().toString().length())));
     }
 }

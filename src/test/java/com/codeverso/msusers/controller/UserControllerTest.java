@@ -1,14 +1,17 @@
 package com.codeverso.msusers.controller;
 
 import com.codeverso.msusers.exception.NotFoundException;
+import com.codeverso.msusers.model.dto.UserRequest;
 import com.codeverso.msusers.model.dto.UserResponse;
 import com.codeverso.msusers.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,8 +22,8 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = UserController.class)
 @ExtendWith(SpringExtension.class)
@@ -35,6 +38,33 @@ public class UserControllerTest {
 
     private static final String USERS_ENDPOINT = "/users";
     private static final String USER_BY_ID_ENDPOINT = "/users/{userId}";
+
+    @Test
+    @DisplayName("Should create a new user")
+    public void shouldCreateANewUser() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+                .name("Gabriel")
+                .age(27)
+                .build();
+
+        String createdUuid = UUID.randomUUID().toString();
+
+        when(userService.createUser(userRequest))
+                .thenReturn(createdUuid);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] body = objectMapper.writeValueAsBytes(userRequest);
+
+        mockMvc.perform(post(USERS_ENDPOINT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", createdUuid));
+
+        verify(userService, times(1)).createUser(userRequest);
+        verifyNoMoreInteractions(userService);
+    }
 
     @Test
     @DisplayName("Should return 404 NotFound when the id does not exist")
