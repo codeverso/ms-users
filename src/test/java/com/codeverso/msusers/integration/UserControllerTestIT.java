@@ -31,6 +31,7 @@ public class UserControllerTestIT {
 
     private static final String USERS_ENDPOINT = "/users";
     private static final String USER_BY_ID_ENDPOINT = "/users/{userId}";
+    private static final Integer UUID_LENGTH = UUID.randomUUID().toString().length();
 
     @Autowired
     private UserRepository userRepository;
@@ -67,7 +68,7 @@ public class UserControllerTestIT {
 
         mockMvc.perform(get(USER_BY_ID_ENDPOINT, uuid))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.uuid", hasLength(UUID.randomUUID().toString().length())))
+                .andExpect(jsonPath("$.uuid", hasLength(UUID_LENGTH)))
                 .andExpect(jsonPath("$.name", is("Murillo")))
                 .andExpect(jsonPath("$.age", is(33)));
     }
@@ -91,6 +92,6 @@ public class UserControllerTestIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", hasLength(UUID.randomUUID().toString().length())));
+                .andExpect(header().string("Location", hasLength(UUID_LENGTH)));
     }
 }
