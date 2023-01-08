@@ -1,6 +1,7 @@
 package com.codeverso.msusers.integration;
 
 import com.codeverso.msusers.integration.core.IntegrationTest;
+import com.codeverso.msusers.integration.factory.UserFactory;
 import com.codeverso.msusers.model.entity.UserEntity;
 import com.codeverso.msusers.repository.UserRepository;
 import com.codeverso.msusers.utils.FileUtils;
@@ -42,15 +43,8 @@ public class UserControllerTestIT {
     @Test
     @DisplayName("Should return all users")
     void shouldReturnAllUsers() throws Exception {
-        UserEntity userMurillo = UserEntity.builder()
-                .age(33)
-                .name("Murillo")
-                .build();
-
-        UserEntity userBabler = UserEntity.builder()
-                .age(27)
-                .name("Babler")
-                .build();
+        UserEntity userMurillo = UserFactory.createUser("Murillo", 33);
+        UserEntity userBabler = UserFactory.createUser("Babler", 27);
 
         userRepository.save(userMurillo);
         userRepository.save(userBabler);
@@ -66,10 +60,7 @@ public class UserControllerTestIT {
     @Test
     @DisplayName("Should return an user by id")
     public void shouldReturnAnUserById() throws Exception {
-        UserEntity userMurillo = UserEntity.builder()
-                .age(33)
-                .name("Murillo")
-                .build();
+        UserEntity userMurillo = UserFactory.createUser("Murillo", 33);
 
         UserEntity userSaved = userRepository.save(userMurillo);
         String uuid = userSaved.getUuid();
@@ -97,7 +88,8 @@ public class UserControllerTestIT {
 
         mockMvc.perform(post(USERS_ENDPOINT)
                         .content(requestBody)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", hasLength(UUID.randomUUID().toString().length())));
     }
