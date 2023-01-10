@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,8 +43,32 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private static final String USERS_ENDPOINT = "/users";
     private static final String USER_BY_ID_ENDPOINT = "/users/{userId}";
+
+    @Test
+    @DisplayName("Should update a user by id")
+    public void shouldUpdateAUserById() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+                .name("Gabriel")
+                .age(27)
+                .build();
+
+        String uuid = UUID.randomUUID().toString();
+
+        byte[] body = objectMapper.writeValueAsBytes(userRequest);
+
+        mockMvc.perform(put(USER_BY_ID_ENDPOINT, uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+                .andExpect(status().isNoContent());
+
+        verify(userService, times(1)).updateUser(userRequest, uuid);
+        verifyNoMoreInteractions(userService);
+    }
 
     @Test
     @DisplayName("Should create a new user")
@@ -58,7 +83,6 @@ public class UserControllerTest {
         when(userService.createUser(userRequest))
                 .thenReturn(createdUuid);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         byte[] body = objectMapper.writeValueAsBytes(userRequest);
 
         mockMvc.perform(post(USERS_ENDPOINT)
