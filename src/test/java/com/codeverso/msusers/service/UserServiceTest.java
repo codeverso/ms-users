@@ -68,6 +68,26 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should create a new user")
+    public void shouldCreateANewUser() {
+        UserRequest userRequest = UserRequest.builder()
+                .name("Gabriel")
+                .age(27)
+                .build();
+
+        UserEntity userEntity = entities.get(0);
+
+        given(userRepository.save(any(UserEntity.class)))
+                .willReturn(userEntity);
+
+        String userCreatedUuid = userService.createUser(userRequest);
+
+        assertThat(userCreatedUuid)
+                .isNotNull()
+                .isEqualTo(userEntity.getUuid());
+    }
+
+    @Test
     @DisplayName("Should throw a not found exception when trying to update an user")
     public void shouldThrowANotFoundExceptionWhenUpdatingUserById() {
         UserRequest userRequest = UserRequest.builder()
@@ -106,29 +126,6 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).save(any(UserEntity.class));
         verify(userRepository, times(1)).findById(userId);
-        verifyNoMoreInteractions(userRepository);
-    }
-
-    @Test
-    @DisplayName("Should create a new user")
-    public void shouldCreateANewUser() {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .age(27)
-                .build();
-
-        UserEntity userEntity = entities.get(0);
-
-        given(userRepository.save(any(UserEntity.class)))
-                .willReturn(userEntity);
-
-        String userCreatedUuid = userService.createUser(userRequest);
-
-        assertThat(userCreatedUuid)
-                .isNotNull()
-                .isEqualTo(userEntity.getUuid());
-
-        verify(userRepository, times(1)).save(any(UserEntity.class));
         verifyNoMoreInteractions(userRepository);
     }
 
