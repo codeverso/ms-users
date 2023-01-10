@@ -68,6 +68,48 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should not partial update an user due to a Not Found Exception")
+    public void shouldNotPartialUpdateAnUserDueToNotFoundException() {
+        UserRequest userRequest = UserRequest.builder()
+                .name("Gabriel")
+                .build();
+
+        String uuid = UUID.randomUUID().toString();
+
+        when(userRepository.findById(uuid))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.partialUpdateUser(userRequest, uuid));
+
+        verify(userRepository, times(1)).findById(uuid);
+        verify(userRepository, times(0)).save(any(UserEntity.class));
+
+        verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    @DisplayName("Should partial update an user")
+    public void shouldPartialUpdateAnUser() {
+        UserRequest userRequest = UserRequest.builder()
+                .name("Gabriel")
+                .build();
+
+        UserEntity userEntity = entities.get(0);
+
+        String uuid = UUID.randomUUID().toString();
+
+        when(userRepository.findById(uuid))
+                .thenReturn(Optional.of(userEntity));
+
+        assertThatCode(() -> userService.partialUpdateUser(userRequest, uuid))
+                .doesNotThrowAnyException();
+
+        verify(userRepository, times(1)).findById(uuid);
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+        verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
     @DisplayName("Should create a new user")
     public void shouldCreateANewUser() {
         UserRequest userRequest = UserRequest.builder()

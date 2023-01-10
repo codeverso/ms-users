@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -48,6 +49,26 @@ public class UserControllerTest {
 
     private static final String USERS_ENDPOINT = "/users";
     private static final String USER_BY_ID_ENDPOINT = "/users/{userId}";
+
+    @Test
+    @DisplayName("Should partial update an user")
+    public void shouldPartialUpdateAnUser() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+                .name("Gabriel")
+                .build();
+
+        String uuid = UUID.randomUUID().toString();
+
+        byte[] body = objectMapper.writeValueAsBytes(userRequest);
+
+        mockMvc.perform(patch(USER_BY_ID_ENDPOINT, uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+                .andExpect(status().isNoContent());
+
+        verify(userService, times(1)).partialUpdateUser(userRequest, uuid);
+        verifyNoMoreInteractions(userService);
+    }
 
     @Test
     @DisplayName("Should create a new user")
