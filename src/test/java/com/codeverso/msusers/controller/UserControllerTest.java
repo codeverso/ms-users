@@ -25,6 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,6 +50,18 @@ public class UserControllerTest {
 
     private static final String USERS_ENDPOINT = "/users";
     private static final String USER_BY_ID_ENDPOINT = "/users/{userId}";
+
+    @Test
+    @DisplayName("Should delete an user by id")
+    public void shouldDeleteAnUserById() throws Exception {
+        String uuid = UUID.randomUUID().toString();
+
+        mockMvc.perform(delete(USER_BY_ID_ENDPOINT, uuid))
+                .andExpect(status().isNoContent());
+
+        verify(userService, times(1)).deleteUserById(uuid);
+        verifyNoMoreInteractions(userService);
+    }
 
     @Test
     @DisplayName("Should partial update an user")
