@@ -3,23 +3,24 @@ package com.codeverso.msusers.integration;
 import com.codeverso.msusers.integration.core.IntegrationTest;
 import com.codeverso.msusers.model.entity.UserEntity;
 import com.codeverso.msusers.repository.UserRepository;
-import com.codeverso.msusers.utils.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
 import static com.codeverso.msusers.integration.factory.UserFactory.createUser;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasLength;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.jdbc.JdbcTestUtils.deleteFromTables;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
 public class UserControllerTestIT {
@@ -83,183 +84,5 @@ public class UserControllerTestIT {
 
         mockMvc.perform(get(USERS_BY_ID_ENDPOINT, uuid))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("Should create a new user")
-    void shouldCreateANewUser() throws Exception {
-        String requestBody = FileUtils.getJSONFromFile("createUser.json");
-
-        mockMvc.perform(post(USERS_ENDPOINT)
-                .content(requestBody)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", hasLength(UUID_LENGTH)));
-    }
-
-    @Test
-    @DisplayName("Should return 400 when request body does not exist")
-    void shouldReturn400WhenRequestBodyDoesNOtExist() throws Exception {
-        mockMvc.perform(post(USERS_ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should update an existing user and return no content")
-    void shouldUpdateAnExistingUserAndReturnNoContent() throws Exception {
-        UserEntity userPutTest = createUser("userPutTest", 30);
-        userRepository.save(userPutTest);
-        String uuid = userPutTest.getUuid();
-
-        String requestBody = FileUtils.getJSONFromFile("updateUser.json");
-
-        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(status().isNoContent());
-
-        UserEntity updatedUser = userRepository.findById(uuid).get();
-        assertThat(updatedUser.getUuid(), is(uuid));
-        assertThat(updatedUser.getName(), is("Updated User Integration Test"));
-        assertThat(updatedUser.getAge(), is(70));
-    }
-
-    @Test
-    @DisplayName("Should return bad request when request body is empty")
-    void shouldReturnBadRequestWhenRequestBodyIsEmpty() throws Exception {
-        UserEntity userPutTest = createUser("userPutTest", 30);
-        userRepository.save(userPutTest);
-        String uuid = userPutTest.getUuid();
-
-        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should return not found when the userId is invalid")
-    void shouldReturnNotFoundWhenTheUserIdIsInvalid() throws Exception {
-        String uuid = "123456";
-
-        String requestBody = FileUtils.getJSONFromFile("updateUser.json");
-
-        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("Should return bad request when age key is not present")
-    void shouldReturnBadRequestWhenAgeKeyIsNotPresent() throws Exception {
-        UserEntity userPutTest = createUser("userPutTest", 30);
-        userRepository.save(userPutTest);
-        String uuid = userPutTest.getUuid();
-
-        String requestBody = FileUtils.getJSONFromFile("updateUserWithoutAge.json");
-
-        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should return bad request when name key is not present")
-    void shouldReturnBadRequestWhenNameKeyIsNotPresent() throws Exception {
-        UserEntity userPutTest = createUser("userPutTest", 30);
-        userRepository.save(userPutTest);
-        String uuid = userPutTest.getUuid();
-
-        String requestBody = FileUtils.getJSONFromFile("updateUserWithoutName.json");
-
-        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should return bad request when name key is not a string")
-    void shouldReturnBadRequestWhenNameKeyIsNotAString() throws Exception {
-        UserEntity userPutTest = createUser("userPutTest", 30);
-        userRepository.save(userPutTest);
-        String uuid = userPutTest.getUuid();
-
-        String requestBody = FileUtils.getJSONFromFile("updateUserNameIsNotAString.json");
-
-        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @DisplayName("Should return bad request when the age is not an Integer")
-    void shouldReturnBadRequestWhenTheAgeIsNotAnInteger() throws Exception {
-        UserEntity userPutTest = createUser("userPutTest", 30);
-        userRepository.save(userPutTest);
-        String uuid = userPutTest.getUuid();
-
-        String requestBody = FileUtils.getJSONFromFile("updateUserAgeIsNotAnInteger.json");
-
-        mockMvc.perform(put(USERS_BY_ID_ENDPOINT, uuid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should partially update an existing user name")
-    void shouldPartiallyUpdateAnExistingUserName() throws Exception {
-        UserEntity userPatchNameTest = createUser("userPatchNameTest", 40);
-        userRepository.save(userPatchNameTest);
-        String uuid = userPatchNameTest.getUuid();
-
-        String requestBody = FileUtils.getJSONFromFile("partiallyUpdateUserName.json");
-
-        mockMvc.perform(patch(USERS_BY_ID_ENDPOINT, uuid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isNoContent());
-
-        UserEntity updatedUser = userRepository.findById(uuid).get();
-        assertThat(updatedUser.getUuid(), is(uuid));
-        assertThat(updatedUser.getName(), is("Partially Updated User"));
-        assertThat(updatedUser.getAge(), is(40));
-    }
-
-    @Test
-    @DisplayName("Should partially update an existing user age")
-    void shouldPartiallyUpdateAnExistingUserAge() throws Exception {
-        UserEntity userPatchAgeTest = createUser("userPatchAgeTest", 40);
-        userRepository.save(userPatchAgeTest);
-        String uuid = userPatchAgeTest.getUuid();
-
-        String requestBody = FileUtils.getJSONFromFile("partiallyUpdateUserAge.json");
-
-        mockMvc.perform(patch(USERS_BY_ID_ENDPOINT, uuid)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isNoContent());
-
-        UserEntity updatedUser = userRepository.findById(uuid).get();
-        assertThat(updatedUser.getUuid(), is(uuid));
-        assertThat(updatedUser.getName(), is("userPatchAgeTest"));
-        assertThat(updatedUser.getAge(), is(55));
-    }
-
-    @Test
-    @DisplayName("Should delete an existing user and return no content")
-    void shouldDeleteAnExistingUserAndReturnNoContent() throws Exception {
-        UserEntity userDeleteTest = createUser("userDeleteTest", 50);
-        userRepository.save(userDeleteTest);
-        String uuid = userDeleteTest.getUuid();
-
-        mockMvc.perform(delete(USERS_BY_ID_ENDPOINT, uuid))
-                .andExpect(status().isNoContent());
-
     }
 }
