@@ -1,6 +1,5 @@
 package com.codeverso.msusers.model.entity;
 
-import com.codeverso.msusers.model.dto.UserRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,16 +42,4 @@ public class UserEntity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:SS")
     private LocalDateTime createdAt;
 
-    public static UserEntity valueOf(UserRequest userRequest) {
-        return UserEntity.builder()
-                .name(userRequest.getName())
-                .age(userRequest.getAge())
-                .build();
-    }
-
-    public void updateValues(UserRequest userRequest) {
-        this.name = userRequest.getName();
-        this.age = userRequest.getAge();
-        this.updatedAt = LocalDateTime.now();
-    }
 }
