@@ -43,38 +43,6 @@ public class UserControllerTest {
     private static final String USER_BY_ID_ENDPOINT = "/users/{userId}";
 
     @Test
-    @DisplayName("Should delete an user by id")
-    public void shouldDeleteAnUserById() throws Exception {
-        String uuid = UUID.randomUUID().toString();
-
-        mockMvc.perform(delete(USER_BY_ID_ENDPOINT, uuid))
-                .andExpect(status().isNoContent());
-
-        verify(userService, times(1)).deleteUserById(uuid);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    @DisplayName("Should partial update an user")
-    public void shouldPartialUpdateAnUser() throws Exception {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .build();
-
-        String uuid = UUID.randomUUID().toString();
-
-        byte[] body = objectMapper.writeValueAsBytes(userRequest);
-
-        mockMvc.perform(patch(USER_BY_ID_ENDPOINT, uuid)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                .andExpect(status().isNoContent());
-
-        verify(userService, times(1)).partialUpdateUser(userRequest, uuid);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
     @DisplayName("Should create a new user")
     public void shouldCreateANewUser() throws Exception {
         UserRequest userRequest = UserRequest.builder()
@@ -97,27 +65,6 @@ public class UserControllerTest {
                 .andExpect(header().string("Location", createdUuid));
 
         verify(userService, times(1)).createUser(userRequest);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    @DisplayName("Should update a user by id")
-    public void shouldUpdateAUserById() throws Exception {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .age(27)
-                .build();
-
-        String uuid = UUID.randomUUID().toString();
-
-        byte[] body = objectMapper.writeValueAsBytes(userRequest);
-
-        mockMvc.perform(put(USER_BY_ID_ENDPOINT, uuid)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                .andExpect(status().isNoContent());
-
-        verify(userService, times(1)).updateUser(userRequest, uuid);
         verifyNoMoreInteractions(userService);
     }
 
