@@ -1,7 +1,5 @@
 package com.codeverso.msusers.controller;
 
-import com.codeverso.msusers.exception.NotFoundException;
-import com.codeverso.msusers.model.dto.UserRequest;
 import com.codeverso.msusers.model.dto.UserResponse;
 import com.codeverso.msusers.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,9 +18,13 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class)
 @ExtendWith(SpringExtension.class)
@@ -40,125 +41,6 @@ public class UserControllerTest {
     private ObjectMapper objectMapper;
 
     private static final String USERS_ENDPOINT = "/users";
-    private static final String USER_BY_ID_ENDPOINT = "/users/{userId}";
-
-    @Test
-    @DisplayName("Should delete an user by id")
-    public void shouldDeleteAnUserById() throws Exception {
-        String uuid = UUID.randomUUID().toString();
-
-        mockMvc.perform(delete(USER_BY_ID_ENDPOINT, uuid))
-                .andExpect(status().isNoContent());
-
-        verify(userService, times(1)).deleteUserById(uuid);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    @DisplayName("Should partial update an user")
-    public void shouldPartialUpdateAnUser() throws Exception {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .build();
-
-        String uuid = UUID.randomUUID().toString();
-
-        byte[] body = objectMapper.writeValueAsBytes(userRequest);
-
-        mockMvc.perform(patch(USER_BY_ID_ENDPOINT, uuid)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                .andExpect(status().isNoContent());
-
-        verify(userService, times(1)).partialUpdateUser(userRequest, uuid);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    @DisplayName("Should create a new user")
-    public void shouldCreateANewUser() throws Exception {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .age(27)
-                .build();
-
-        String createdUuid = UUID.randomUUID().toString();
-
-        when(userService.createUser(userRequest))
-                .thenReturn(createdUuid);
-
-        byte[] body = objectMapper.writeValueAsBytes(userRequest);
-
-        mockMvc.perform(post(USERS_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                .andExpect(status().isCreated())
-                .andExpect(header().exists("Location"))
-                .andExpect(header().string("Location", createdUuid));
-
-        verify(userService, times(1)).createUser(userRequest);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    @DisplayName("Should update a user by id")
-    public void shouldUpdateAUserById() throws Exception {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .age(27)
-                .build();
-
-        String uuid = UUID.randomUUID().toString();
-
-        byte[] body = objectMapper.writeValueAsBytes(userRequest);
-
-        mockMvc.perform(put(USER_BY_ID_ENDPOINT, uuid)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                .andExpect(status().isNoContent());
-
-        verify(userService, times(1)).updateUser(userRequest, uuid);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    @DisplayName("Should return 404 NotFound when the id does not exist")
-    public void shouldReturnNotFoundExceptionWhenIdDoesNotExist() throws Exception {
-        String invalidId = "abc123";
-
-        when(userService.getUserById(invalidId))
-                .thenThrow(new NotFoundException());
-
-        mockMvc.perform(get(USER_BY_ID_ENDPOINT, invalidId))
-                .andExpect(status().isNotFound());
-
-        verify(userService, times(1)).getUserById(invalidId);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    @DisplayName("Should return an user by id")
-    public void shouldReturnAnUserById() throws Exception {
-        String uuid = UUID.randomUUID().toString();
-
-        UserResponse userResponse = UserResponse.builder()
-                .name("Gabriel")
-                .age(27)
-                .uuid(uuid)
-                .build();
-
-        when(userService.getUserById(uuid))
-                .thenReturn(userResponse);
-
-        mockMvc.perform(get(USER_BY_ID_ENDPOINT, uuid))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.uuid", is(uuid)))
-                .andExpect(jsonPath("$.name", is("Gabriel")))
-                .andExpect(jsonPath("$.age", is(27)));
-
-        verify(userService, times(1)).getUserById(uuid);
-        verifyNoMoreInteractions(userService);
-    }
 
     @Test
     @DisplayName("Should return a list with all users")
@@ -188,5 +70,4 @@ public class UserControllerTest {
         verify(userService, times(1)).getAllUsers();
         verifyNoMoreInteractions(userService);
     }
-
 }

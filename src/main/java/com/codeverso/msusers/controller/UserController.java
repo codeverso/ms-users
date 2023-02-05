@@ -1,11 +1,12 @@
 package com.codeverso.msusers.controller;
 
-import com.codeverso.msusers.model.dto.UserRequest;
 import com.codeverso.msusers.model.dto.UserResponse;
 import com.codeverso.msusers.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -25,34 +26,4 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserResponse getUserById(@PathVariable(name = "userId") String userId) {
-        return userService.getUserById(userId);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createUser(@RequestBody UserRequest userRequest, HttpServletResponse httpServletResponse) {
-        String createdUserId = userService.createUser(userRequest);
-        httpServletResponse.setHeader("Location", createdUserId);
-    }
-
-    @PutMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUser(@RequestBody UserRequest userRequest, @PathVariable(name = "userId") String userId){
-        userService.updateUser(userRequest, userId);
-    }
-
-    @PatchMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void partialUpdateUser(@RequestBody UserRequest userRequest, @PathVariable(name = "userId") String userId) {
-        userService.partialUpdateUser(userRequest, userId);
-    }
-
-    @DeleteMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserById(@PathVariable(name = "userId") String userId) {
-        userService.deleteUserById(userId);
-    }
 }
