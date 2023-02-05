@@ -72,11 +72,4 @@ public class UserService {
 
         userRepository.save(userEntity);
     }
-
-    public void deleteUserById(String userId) {
-        log.info("Deleting userId {}", userId);
-
-        userRepository.findById(userId)
-                .ifPresent(userRepository::delete);
-    }
 }
