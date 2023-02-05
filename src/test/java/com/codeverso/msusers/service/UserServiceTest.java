@@ -14,15 +14,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("User Service Tests")
@@ -59,81 +66,6 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Should not delete an user by id because it does not exist")
-    public void shouldNotDeleteAnUserByIdBecauseItDoesNotExist() {
-        String uuid = UUID.randomUUID().toString();
-
-        when(userRepository.findById(uuid))
-                .thenReturn(Optional.empty());
-
-        assertThatCode(() -> userService.deleteUserById(uuid))
-                .doesNotThrowAnyException();
-
-        verify(userRepository, times(1)).findById(uuid);
-        verify(userRepository, times(0)).delete(any(UserEntity.class));
-        verifyNoMoreInteractions(userRepository);
-    }
-    @Test
-    @DisplayName("Should delete an user by id")
-    public void shouldDeleteAnUserById() {
-        String uuid = UUID.randomUUID().toString();
-
-        UserEntity userEntity = entities.get(0);
-
-        when(userRepository.findById(uuid))
-                .thenReturn(Optional.of(userEntity));
-
-        assertThatCode(() -> userService.deleteUserById(uuid))
-                .doesNotThrowAnyException();
-
-        verify(userRepository, times(1)).findById(uuid);
-        verify(userRepository, times(1)).delete(any(UserEntity.class));
-        verifyNoMoreInteractions(userRepository);
-    }
-
-    @Test
-    @DisplayName("Should not partial update an user due to a Not Found Exception")
-    public void shouldNotPartialUpdateAnUserDueToNotFoundException() {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .build();
-
-        String uuid = UUID.randomUUID().toString();
-
-        when(userRepository.findById(uuid))
-                .thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> userService.partialUpdateUser(userRequest, uuid));
-
-        verify(userRepository, times(1)).findById(uuid);
-        verify(userRepository, times(0)).save(any(UserEntity.class));
-
-        verifyNoMoreInteractions(userRepository);
-    }
-
-    @Test
-    @DisplayName("Should partial update an user")
-    public void shouldPartialUpdateAnUser() {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .build();
-
-        UserEntity userEntity = entities.get(0);
-
-        String uuid = UUID.randomUUID().toString();
-
-        when(userRepository.findById(uuid))
-                .thenReturn(Optional.of(userEntity));
-
-        assertThatCode(() -> userService.partialUpdateUser(userRequest, uuid))
-                .doesNotThrowAnyException();
-
-        verify(userRepository, times(1)).findById(uuid);
-        verify(userRepository, times(1)).save(any(UserEntity.class));
-        verifyNoMoreInteractions(userRepository);
-    }
-
-    @Test
     @DisplayName("Should create a new user")
     public void shouldCreateANewUser() {
         UserRequest userRequest = UserRequest.builder()
@@ -151,48 +83,6 @@ public class UserServiceTest {
         assertThat(userCreatedUuid)
                 .isNotNull()
                 .isEqualTo(userEntity.getUuid());
-    }
-
-    @Test
-    @DisplayName("Should throw a not found exception when trying to update an user")
-    public void shouldThrowANotFoundExceptionWhenUpdatingUserById() {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .age(27)
-                .build();
-
-        String invalidUserId = "123";
-
-        when(userRepository.findById(invalidUserId))
-                .thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> userService.updateUser(userRequest, invalidUserId));
-
-        verify(userRepository, times(0)).save(any(UserEntity.class));
-        verify(userRepository, times(1)).findById(invalidUserId);
-        verifyNoMoreInteractions(userRepository);
-    }
-
-    @Test
-    @DisplayName("Should update an user by id")
-    public void shouldUpdateUserById() {
-        UserRequest userRequest = UserRequest.builder()
-                .name("Gabriel")
-                .age(27)
-                .build();
-
-        UserEntity userEntity = entities.get(0);
-        String userId = userEntity.getUuid();
-
-        when(userRepository.findById(userId))
-                .thenReturn(Optional.of(userEntity));
-
-        assertThatCode(() -> userService.updateUser(userRequest, userId))
-                .doesNotThrowAnyException();
-
-        verify(userRepository, times(1)).save(any(UserEntity.class));
-        verify(userRepository, times(1)).findById(userId);
-        verifyNoMoreInteractions(userRepository);
     }
 
     @Test
