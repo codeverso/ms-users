@@ -1,5 +1,14 @@
 version: '3'
 services:
+  codeverso:
+    container_name: codeverso
+    image: codeverso:latest
+    restart: always
+    build: .
+    ports:
+      - "8082:8080"
+    links:
+      - db
   db:
     container_name: db_users
     image: postgres:14.5

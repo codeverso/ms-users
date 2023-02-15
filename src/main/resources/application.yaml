@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://192.168.15.176:5432/users
+    username: admin
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    enabled: true
