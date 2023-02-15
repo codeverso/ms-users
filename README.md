@@ -17,19 +17,19 @@ Microservice used for youtube videos tutorials.
 Go into the repository you just cloned:\
 `cd ms-users`
 
-Then build and download all the dependencies from the application:\
+Build and download all the dependencies from the application:\
 `mvn clean install`
 
 Build the dockerfile to create the image's application:\
 `docker build -t codeverso .`
 
-Then, just run the docker-compose file:\
+Run the docker-compose file:\
 `docker-compose -f src/main/resources/docker-compose/docker-compose.yml up -d`
 
-You can check if the Postgres and Codeverso images are running using the command:\
+To check if the Postgres and Codeverso images are running using the command:\
 `docker ps`
 
-After that, you are able to call the endpoints from the container through the url:\
+If everything is working good, you can call the endpoints from the container through the url:\
 `http://localhost:8082/users`
 
 
