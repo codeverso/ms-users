@@ -102,6 +102,28 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Should not update an user by id due to field name has numbers")
+    public void shouldNotUpdateUserByIdDueToFieldNameHasNumbers() throws Exception {
+        UserRequest userRequest = UserRequest.builder()
+                .name("Gabriel123")
+                .age(27)
+                .build();
+
+        String uuid = UUID.randomUUID().toString();
+
+        byte[] body = objectMapper.writeValueAsBytes(userRequest);
+
+        mockMvc.perform(put(USER_BY_ID_ENDPOINT, uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].message", is("The field name shouldn't accept numbers")));
+
+        verify(userService, times(0)).updateUser(userRequest, uuid);
+    }
+
+    @Test
     @DisplayName("Should not update an user by id due to missing fields")
     public void shouldNotUpdateUserDueToMissingFields() throws Exception {
         UserRequest userRequest = UserRequest.builder()

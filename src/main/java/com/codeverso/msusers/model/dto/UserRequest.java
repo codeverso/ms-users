@@ -1,5 +1,6 @@
 package com.codeverso.msusers.model.dto;
 
+import com.codeverso.msusers.validation.annotation.ValidName;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class UserRequest {
 
     @NotEmpty(message = "The field name is required")
+    @ValidName
     private String name;
 
     @NotNull(message = "The field age is required")
