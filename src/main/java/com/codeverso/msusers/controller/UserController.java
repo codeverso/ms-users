@@ -4,6 +4,7 @@ import com.codeverso.msusers.model.dto.UserRequest;
 import com.codeverso.msusers.model.dto.UserResponse;
 import com.codeverso.msusers.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +50,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUser(@RequestBody UserRequest userRequest, @PathVariable(name = "userId") String userId){
+    public void updateUser(@RequestBody @Valid UserRequest userRequest, @PathVariable(name = "userId") String userId){
         userService.updateUser(userRequest, userId);
     }
 
