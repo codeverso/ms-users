@@ -8,6 +8,6 @@ public class ValidNameValidator implements ConstraintValidator<ValidName, String
 
     @Override
     public boolean isValid(String fieldName, ConstraintValidatorContext constraintValidatorContext) {
-        return !fieldName.matches(".*[0-9].*");
+        return fieldName == null || !fieldName.matches(".*[0-9].*");
     }
 }
